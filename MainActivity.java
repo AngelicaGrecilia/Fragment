@@ -1,5 +1,6 @@
 package com.example.fragmentexample1updated;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -7,12 +8,14 @@ import androidx.fragment.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SimpleFragment.OnFragmentInteractionListener {
 
     private Button mOpenButton;
     private Boolean isFragmentDisplayed = false;
-
+    private static final String FRAGMENT_STATE = "fragment-state";
+    private int mChoice = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,6 +23,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         mOpenButton = findViewById(R.id.open_button);
+        if (savedInstanceState != null){
+            isFragmentDisplayed = savedInstanceState.getBoolean(FRAGMENT_STATE);
+
+            if(isFragmentDisplayed){
+                mOpenButton.setText(R.string.close);
+            }
+        }
         mOpenButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view){
@@ -50,9 +60,20 @@ public class MainActivity extends AppCompatActivity {
         SimpleFragment simpleFragment = (SimpleFragment) fragmentManager.findFragmentById(R.id.fragment_container);
         fragmentTransaction.remove(simpleFragment).commit();
 
-        mOpenButton.setText(R.string.close);
+        mOpenButton.setText(R.string.open);
         isFragmentDisplayed = false;
 
 
+    }
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        outState.putBoolean(FRAGMENT_STATE, isFragmentDisplayed);
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void OnRadioButtonChoiceChecked(int choice) {
+        mChoice = choice;
+        Toast.makeText(this, "Choice is " + String.valueOf(choice),Toast.LENGTH_SHORT).show();
     }
 }
